@@ -5,11 +5,11 @@ class Task
 
     function __construct($description)
     {
-      $this->description = $descrption;
+      $this->description = $description;
     }
     function setDescription($new_description)
     {
-      $this->description = (string) $new_description
+      $this->description = (string) $new_description;
     }
     function getDescription()
     {
