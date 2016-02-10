@@ -9,48 +9,21 @@
 
     $app = new Silex\Application();
 
+    $app->register(new Silex\Provider\TwigServiceProvider(), array(
+    'twig.path' => __DIR__.'/../views'
+));
 
-    $app->get("/", function() {
-      $output = "";
 
-      $all_tasks = Task::getAll();
+    $app->get("/", function() use ($app) {
 
-      if(!empty($all_tasks)){
-        $output = $output . "
-          <h1>To Do List:</h1>
-          <p>Here are all your tasks:</p>
-        ";
+      return $app['twig']->render('tasks.html.twig', array('tasks' => Task::getAll()));
 
-        }
-          foreach (Task::getAll() as $task) {
-            $output = $output.'<p>'.$task->getDescription().'<p>';
-        }
-
-      $output = $output . "
-        <form action='/tasks' method='post'>
-          <label for='description'>Task Description:</label>
-          <input id='description' name='description' type='text'>
-
-          <button type='submit'>Add Task</button>
-        </form>
-      ";
-
-      $output .= "
-      <form action='/delete_tasks' method='post'>
-          <button type='submit'>delete</button>
-      </form>
-      ";
-    return $output;
 });
 
-    $app->post("/tasks", function(){
-      $task = new Task($_POST['description']);
-      $task->save();
-      return "
-        <h1>You created a task</h1>
-        <p>" . $task->getDescription() . "</p>
-        <p><a href='/'>View your list of things to do.</a></p>
-      ";
+    $app->post("/tasks", function() use ($app) {
+    $task = new Task($_POST['description']);
+    $task->save();
+    return $app['twig']->render('create_task.html.twig');
     });
 
     $app->post("/delete_tasks", function() {
